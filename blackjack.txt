@@ -1,0 +1,719 @@
+#include<stdio.h>
+#include<conio.h>
+#include <math.h>
+#include<stdlib.h>
+//founction to red the cards
+int cardRed(int Array1d[], int size);
+//founction to display dealer winers
+int dealerwin(int a, int q);
+//founction to display player winers
+int palyWin(int a, int b);
+//founction to display draw
+int draw(int s, int w);
+//founction to display end of game
+int endGame();
+
+int main()
+{
+	// cards for the numbers of the card
+	int cards[52] = { 2,3,4,5,6,7,8,9,10,10,10,10,1,2,3,4,5,6,7,8,9,10,10,10,10,1,2,3,4,5,6,7,8,9,10,10,10,10,1,2,3,4,5,6,7,8,9,10,10,10,10,1 };
+	// num to choise random card 
+	int num[52];
+	// dealer choise card 
+	int dealer[5];
+	// player choise card 
+	int player1[5];
+	int player2[5];
+	int player3[5];
+	// game for stard or end of the game
+	int game;
+	int numOfplay;//for number of player
+	int chose;// for chose  Stand\ Hit\ Split
+	int totDea;//the sum of dealer cards
+	int totpalyer;//the sum of palyer1 cards
+	int totpalyer1;//the sum of palyer2 cards
+	int totpalyer2;//the sum of palyer3 cards
+	//asking player to start the game
+	printf("enter 1 for star thee game\n");
+	scanf("%d", &game);
+	//while the input not equal 0 start the game
+	while (game != 0)
+	{
+		//reding the card into num[52]
+		for (int m = 0; m < 52; m++)
+		{
+			num[m] = cards[m];
+		}
+		//input the number of player
+		printf("enter the number of player\n");
+		scanf("%d", &numOfplay);
+		//for loop run 2 time as the game of blackjack just like 2 turn
+		for (int j = 0; j < 2; j++)
+		{
+			if (numOfplay == 1)//for one play + dealer
+			{
+				//for first turn
+				if (j == 0)
+				{
+					printf("   Dealer      player\n");
+					dealer[0] = cardRed(num, 52);//give card to dealer
+					player1[0] = cardRed(num, 52);//give card to player1
+					printf("      %d        %d\n", dealer[0], player1[0]);//display the card in printout
+				}
+				//for the scound turn
+				if (j == 1)
+				{
+					dealer[1] = cardRed(num, 52);//give card to dealer
+					player1[1] = cardRed(num, 52);//give card to player1
+					//if statment for display the blackjack
+					if ((dealer[0] == 1 && dealer[1] == 10 || dealer[0] == 10 && dealer[1] == 1 && dealer[0] == 1) && (player1[0] == 1 && player1[1] == 10 || player1[0] == 10 && player1[1] == 1))
+					{
+						printf("      %d        %d\n", dealer[1], player1[1]);;
+						printf("*blackjack******blackjack*******\n");
+						game = endGame();
+					}
+					else if (player1[0] == 1 && player1[1] == 10 || player1[0] == 10 && player1[1] == 1)
+					{
+						printf("      %d        %d\n", dealer[1], player1[1]);
+						printf("****************blackjack\n");
+						game = endGame();
+					}
+					else if (dealer[0] == 1 && dealer[1] == 10 || dealer[0] == 10 && dealer[1] == 1)
+					{
+						printf("      %d        %d\n", dealer[1], player1[1]);
+						printf("*blackjack************************************\n");
+						game = endGame();
+					}
+					else//else if they wasnt blackjack
+					{   //display the crads and total of the card 
+						totpalyer = player1[0] + player1[1];
+						totDea = dealer[0] + dealer[1];
+						printf("      0        %d\n", player1[1]);
+						printf("Total %d        %d\n", dealer[0], totpalyer);
+						if (player1[0] == player1[1])// if they any chance for Split
+						{
+							printf("************pleas Enter\n1 for Stand\n2 for Hit\n3 for Split\n");
+							scanf("%d", &chose);
+							if (chose == 1)//player chose stand
+							{   // display the cards
+								printf("   Dealer      player\n");
+								printf("      %d        %d\n", dealer[0], player1[0]);
+								printf("      %d        %d\n", dealer[1], player1[1]);
+								if (totpalyer < totDea)//if the sum card for dealer higher then player then the dealer win
+								{
+									game = dealerwin(totDea, totpalyer);
+								}
+								else
+								{  //else hit more card to dealer until the sum be more then the sum of player and less then 21
+									for (int i = 2; i < 5; i++)//for loop as dealer he cant get more then 5 time hit
+									{
+										while (totDea < totpalyer && totDea <= 21)//as longer the sum less then player sum and 22
+										{
+											dealer[i] = cardRed(num, 52);
+											totDea = totDea + dealer[i];
+											printf("      %d        %d\n", dealer[i], player1[1]);
+										}
+
+									}
+									// dealer win if the sum of the card great then player and less then 21
+									if (totDea > totpalyer && totDea <= 21)
+									{
+										game = dealerwin(totDea, totpalyer);
+									}// draw game when the dealer sum == player sum
+									else if (totDea == totpalyer)
+									{
+										game = draw(totDea, totpalyer);
+									}
+									else// player win if the sum of the card great then dealer and less then 21
+									{
+										game = palyWin(totDea, totpalyer);
+									}
+								}
+							}
+							else if (chose == 2)//player chose Hit
+							{
+								int indx = 2;// indx for number of hit no more then 5 time
+								while (chose == 2 && indx < 5)//while loop as longer player chose hit
+								{
+									printf("   Dealer      player\n");
+									printf("      %d        %d\n", dealer[0], player1[0]);
+									printf("      0         %d\n", player1[1]);
+									player1[indx] = cardRed(num, 52);
+									totpalyer = totpalyer + player1[indx];
+									printf("      0         %d\n", player1[indx]);
+									if (totpalyer <= 21)// if player sum less then 21 asking for the option
+									{
+										printf("Total %d        %d\n", dealer[0], totpalyer);
+										indx++;
+										printf("*******************pleas Enter\n1 for Stand\n2 for Hit\n");
+										scanf("%d", &chose);
+									}
+									else
+									{
+										game = dealerwin(totDea, totpalyer);
+										chose = 0;
+									}
+								}
+									if (chose == 1)
+									{
+										printf("   Dealer      player\n");
+										printf("      %d        %d\n", dealer[0], player1[0]);
+										printf("      %d        %d\n", dealer[1], player1[1]);
+										if (totpalyer > totDea)
+										{
+											for (int i = 2; i < 5; i++)
+											{
+												while (totDea < totpalyer && totDea <= 21)
+												{
+													dealer[i] = cardRed(num, 52);
+													totDea = totDea + dealer[i];
+													printf("      %d        %d\n", dealer[i], player1[1]);
+												}
+
+											}
+											if (totDea > totpalyer && totDea <= 21)
+											{
+												game = dealerwin(totDea, totpalyer);
+
+											}
+											else if (totDea == totpalyer)
+											{
+												game = draw(totDea, totpalyer);
+											}
+											else
+											{
+												game = palyWin(totDea, totpalyer);
+											}
+
+										}
+										else
+										{
+											game = dealerwin(totDea, totpalyer);
+										}
+									}
+							}
+							else if(chose == 3)
+							{
+								int split[5];
+								int totsplit;
+								int playtotal;
+								split[0] = player1[0];
+								printf("   Dealer      player\n");
+								printf("      %d        %d  %d\n", dealer[0], split[0], player1[0]);
+								split[1] = cardRed(num, 52);
+								player1[1] = cardRed(num, 52);
+								//printf("      0        %d  %d\n", split[1], player1[1]);
+								if (player1[0] == 1 && player1[1] == 10 || player1[0] == 10 && player1[1] == 1)
+								{
+									printf("      %d        %d  %d\n", dealer[1], split[1], player1[1]);
+									printf("***********blackjack\n");
+									game = endGame();
+								}
+								else if (split[0] == 1 && split[1] == 10 || split[0] == 10 && split[1] == 1)
+								{
+									printf("      %d        %d  %d\n", dealer[1], split[1], player1[1]);
+									printf("***********blackjack\n");
+									game = endGame();
+								}
+								totsplit = split[0] + split[1];
+								playtotal = player1[0] + player1[1];
+								printf("      0        %d  %d\n", split[1], player1[1]);
+								printf("Total %d       %d  %d\n", dealer[0],totsplit, playtotal);
+								printf("*******************pleas Enter\n1 for Stand\n2 for Hit\n");
+								scanf("%d", &chose);
+								if (chose == 1)
+								{
+									printf("   Dealer      player\n");
+									printf("      %d        %d  %d\n", dealer[0], split[0], player1[0]);
+									printf("      %d        %d  %d\n", dealer[1], split[1], player1[1]);
+
+									if (totDea > totsplit && totDea > playtotal)
+									{
+										printf("Total %d         %d  %d\n", totDea, totsplit, playtotal);
+										printf("  DELAER WIN    play LOSS\n");
+										printf("*******************End of the game \n");
+										printf("Enter 1 to start ot 0 to exit \n");
+										scanf("%d", &game);
+									}
+									else
+									{
+										for (int i = 2; i < 5; i++)
+										{
+											while (totDea < totsplit && totDea < playtotal && totDea <= 21)
+											{
+												dealer[i] = cardRed(num, 52);
+												totDea = totDea + dealer[i];
+												printf("      %d        %d  %d\n", dealer[i], split[1], player1[1]);
+											}
+
+										}
+										if (totDea > totsplit && totDea > playtotal)
+										{
+											printf("Total %d         %d  %d\n", totDea, totsplit, playtotal);
+											printf("  DELAER WIN    play LOSS\n");
+											printf("*******************End of the game \n");
+											printf("Enter 1 to start ot 0 to exit \n");
+											scanf("%d", &game);
+										}
+										else
+										{
+
+											printf("Total %d         %d  %d\n", totDea, totsplit, playtotal);
+											printf("  DELAER LOS    play WIN\n");
+											printf("*******************End of the game \n");
+											printf("Enter 1 to start ot 0 to exit \n");
+
+										}
+
+									}
+								}
+							}
+						}
+						//else
+						{
+							printf("*****************pleas Enter\n1 for Stand\n2 for Hit\n");
+							scanf("%d", &chose);
+							if (chose == 1)
+							{
+								totDea = dealer[0] + dealer[1];
+								printf("   Dealer      player\n");
+								printf("      %d        %d\n", dealer[0], player1[0]);
+								printf("      %d        %d\n", dealer[1], player1[1]);
+								if (totpalyer > totDea)
+								{
+									for (int i = 2; i < 5; i++)
+									{
+										while (totDea < totpalyer && totDea <= 21)
+										{
+											dealer[i] = cardRed(num, 52);
+											totDea = totDea + dealer[i];
+											printf("      %d        %d\n", dealer[i], player1[1]);
+										}
+
+									}
+									if (totDea > totpalyer && totDea <= 21)
+									{
+										game = dealerwin(totDea, totpalyer);
+									}
+									else if (totDea == totpalyer)
+									{
+										game = draw(totDea, totpalyer);
+									}
+									else
+									{
+										game = palyWin(totDea, totpalyer);
+									}
+
+								}
+
+								else
+								{
+									game = dealerwin(totDea, totpalyer);
+								}
+							}
+							else if (chose == 2)
+							{
+								int indx = 2;
+
+								while (chose == 2)
+								{
+									printf("   Dealer      player\n");
+									printf("      %d        %d\n", dealer[0], player1[0]);
+									printf("      0        %d\n", player1[1]);
+									player1[indx] = cardRed(num, 52);
+									totpalyer = totpalyer + player1[indx];
+									printf("      0        %d\n", player1[indx]);
+									if (totpalyer <= 21)
+									{
+										printf("Total %d        %d\n", dealer[0], totpalyer);
+										indx++;
+										printf("*****************pleas Enter\n1 for Stand\n2 for Hit\n");
+										scanf("%d", &chose);
+									}
+									else
+									{
+										game = dealerwin(totDea, totpalyer);
+										chose = 0;
+									}
+								}
+
+								if (chose == 1)
+								{
+									totDea = dealer[0] + dealer[1];
+									printf("   Dealer      player\n");
+									printf("      %d        %d\n", dealer[0], player1[0]);
+									printf("      %d        %d\n", dealer[1], player1[1]);
+									if (totpalyer > totDea)
+									{
+										for (int i = 2; i < 5; i++)
+										{
+											while (totDea < totpalyer && totDea <= 21)
+											{
+												dealer[i] = cardRed(num, 52);
+												totDea = totDea + dealer[i];
+												printf("      %d        %d\n", dealer[i], player1[1]);
+											}
+
+										}
+										if (totDea > totpalyer && totDea <= 21)
+										{
+											game = dealerwin(totDea, totpalyer);
+
+										}
+										else
+										{
+											game = palyWin(totDea, totpalyer);
+										}
+
+									}
+									else if (totDea == totpalyer)
+									{
+										game = draw(totDea, totpalyer);
+									}
+
+									else
+									{
+										game = dealerwin(totDea, totpalyer);
+									}
+								}
+
+							}
+						}
+					}
+				}
+			}
+			else if (numOfplay == 2) //for 2 play + dealer
+			{
+				if (j == 0)
+				{
+					printf("   Dealer      player1      player2\n");
+					dealer[0] = cardRed(num, 52);//give card to dealer
+					player1[0] = cardRed(num, 52);//give card to player1
+					player2[0] = cardRed(num, 52);//give card to player2
+					printf("      %d        %d            %d\n", dealer[0], player1[0], player2[0]);//display the card in printout
+				}
+				if (j == 1)
+				{
+					dealer[1] = cardRed(num, 52);//give card to dealer
+					player1[1] = cardRed(num, 52);//give card to player1
+					player2[1] = cardRed(num, 52);//give card to player2
+					totpalyer = player1[0] + player1[1];
+					totpalyer1 = player2[0] + player2[1];
+					totDea = dealer[0] + dealer[1];
+
+
+					if ((dealer[0] == 1|| dealer[0] == 10 && totDea == 11) && (player1[0] == 1 || player1[0] == 10 && totpalyer == 11) && (player2[0] == 1 || player2[0] == 10 && totpalyer1 == 11))
+					{
+						printf("      %d        %d            %d\n", dealer[1], player1[1], player2[1]);//display the card in printout
+						printf("*blackjack******blackjack*******blackjack\n");
+						game = endGame();
+					}
+					else if (player1[0] == 1 || player1[0] == 10 && totpalyer == 11)
+					{
+						printf("      %d        %d            %d\n", dealer[1], player1[1], player2[1]);//display the card in printout;
+						printf("****************blackjack****************\n");
+						game = endGame();
+					}
+					else if (dealer[0] == 1 || dealer[0] == 10 && totDea == 11)
+					{
+						printf("      %d        %d            %d\n", dealer[1], player1[1], player2[1]);//display the card in printout
+						printf("*blackjack************************************\n");
+						game = endGame();
+					}
+					else if (player2[0] == 1 || player2[0] == 10 && totpalyer1 == 11)
+					{
+						printf("      %d        %d            %d\n", dealer[1], player1[1], player2[1]);//display the card in printout
+						printf("******************************blackjack\n");
+						game = endGame();
+					}
+					else
+					{
+						int choseplay2;
+						printf("      0        %d            %d\n",player1[1], player2[1]);
+						printf("      %d        %d            %d total\n", dealer[0], totpalyer,totpalyer1);
+						printf("player1 *************pleas Enter\n1 for Stand\n2 for Hit\n");
+						scanf("%d", &chose);
+						printf("player2 *************pleas Enter\n1 for Stand\n2 for Hit\n");
+						scanf("%d", &choseplay2);
+						if (chose == 1 && choseplay2 == 1)
+						{
+							int w = 2;
+							printf("   Dealer      player1      player2\n");
+							printf("      %d        %d            %d\n", dealer[0], player1[0], player2[0]);
+							printf("      %d        %d            %d\n", dealer[1],player1[1], player2[1]);
+							while (totDea < totpalyer || totDea < totpalyer1 & totDea < 21)
+							{
+								dealer[w] = cardRed(num, 52);
+								printf("      %d       0            0\n", dealer[w]);
+								totDea = totDea + dealer[w];
+								w++;
+							}
+							if (totDea > 21)
+							{
+								if (totpalyer > totpalyer1)
+								{
+									printf("      %d      %d            %d total\n", totDea, totpalyer, totpalyer1);
+									printf("              winer        \n");
+									game = endGame();
+								}
+								else if (totpalyer1 > totpalyer)
+								{
+									printf("      %d      %d            %d total\n", totDea, totpalyer, totpalyer1);
+									printf("                             winer       \n");
+									game = endGame();
+								}
+							}
+							else 
+							{
+								if (totDea > totpalyer && totDea > totpalyer1)
+								{
+									printf("      %d      %d            %d total\n", totDea, totpalyer, totpalyer1);
+									printf("     winer        \n");
+									game = endGame();
+								}
+								else if (totpalyer > totDea && totpalyer > totpalyer1)
+								{
+									printf("      %d      %d            %d total\n", totDea, totpalyer, totpalyer1);
+									printf("               winer        \n");
+									game = endGame();
+								}
+								else if (totpalyer1 > totpalyer && totpalyer1 > totDea)
+								{
+									printf("      %d      %d            %d total\n", totDea, totpalyer, totpalyer1);
+									printf("                             winer       \n");
+									game = endGame();
+								}
+							}
+
+						}
+						else if(chose == 1 && choseplay2 == 2)
+						{
+							int pl = 2;
+							printf("   Dealer      player1      player2\n");
+							printf("      %d        %d            %d\n", dealer[0], player1[0], player2[0]);
+							printf("      0        %d            %d\n", player1[1], player2[1]);
+							while (choseplay2 == 2 && totpalyer1 < 21)
+							{
+								player2[pl] = cardRed(num, 52);
+								printf("      0        0            %d\n", player2[pl]);
+								totpalyer1 = totpalyer1 + player2[pl];
+								pl++;
+								if (totpalyer1 > 21)
+								{
+									choseplay2 = 0;
+								}
+								else
+								{
+									printf("player2 *************pleas Enter\n1 for Stand\n2 for Hit\n");
+									scanf("%d", &choseplay2);
+								}
+							}
+							if (choseplay2 == 1)
+							{
+								if (totDea > 21)
+								{
+									if (totpalyer > totpalyer1)
+									{
+										printf("      %d      %d            %d total\n", totDea, totpalyer, totpalyer1);
+										printf("               winer        \n");
+										game = endGame();
+									}
+									else if (totpalyer1 > totpalyer)
+									{
+										printf("      %d      %d            %d total\n", totDea, totpalyer, totpalyer1);
+										printf("                             winer       \n");
+										game = endGame();
+									}
+								}
+								else
+								{
+									if (totDea > totpalyer && totDea > totpalyer1)
+									{
+										printf("      %d      %d            %d total\n", totDea, totpalyer, totpalyer1);
+										printf("     winer        \n");
+										game = endGame();
+									}
+									else if (totpalyer > totDea && totpalyer > totpalyer1)
+									{
+										printf("      %d      %d            %d total\n", totDea, totpalyer, totpalyer1);
+										printf("               winer        \n");
+										game = endGame();
+									}
+									else if (totpalyer1 > totpalyer && totpalyer1 > totDea)
+									{
+										printf("      %d      %d            %d total\n", totDea, totpalyer, totpalyer1);
+										printf("                             winer       \n");
+										game = endGame();
+									}
+								}
+							}
+							else
+							{
+								int r = 2;
+								while (totDea < totpalyer || totDea < totpalyer1 & totDea < 21)
+								{
+									dealer[r] = cardRed(num, 52);
+									printf("      %d       0            0\n", dealer[r]);
+									totDea = totDea + dealer[r];
+									r++;
+								}
+								if (totDea > 21)
+								{
+									printf("      %d      %d            %d total\n", totDea, totpalyer, totpalyer1);
+									printf("             winer        \n");
+									game = endGame();
+								}
+								else
+								{
+									if (totDea > totpalyer && totDea > totpalyer1)
+									{
+										printf("      %d      %d            %d total\n", totDea, totpalyer, totpalyer1);
+										printf("     winer        \n");
+										game = endGame();
+									}
+									else if (totpalyer > totDea && totpalyer > totpalyer1)
+									{
+										printf("      %d      %d            %d total\n", totDea, totpalyer, totpalyer1);
+										printf("              winer        \n");
+										game = endGame();
+									}
+
+								}
+							}
+						}
+					}
+				}
+
+			}
+			else if (numOfplay == 3) //for 3 play + dealer
+			{
+			if (j == 0)
+			{
+				printf("   Dealer      player1      player2      player3\n");
+				dealer[0] = cardRed(num, 52);//give card to dealer
+				player1[0] = cardRed(num, 52);//give card to player1
+				player2[0] = cardRed(num, 52);//give card to player2
+				player3[0] = cardRed(num, 52);//give card to player3
+				printf("      %d        %d            %d            %d\n", dealer[0], player1[0],player2[0], player3[0]);//display the card in printout
+			}
+			if (j == 1)
+			{
+				dealer[1] = cardRed(num, 52);//give card to dealer
+				player1[1] = cardRed(num, 52);//give card to player1
+				player2[1] = cardRed(num, 52);//give card to player2
+				player3[1] = cardRed(num, 52);//give card to player3
+				printf("      %d        %d            %d           %d\n", dealer[1], player1[1], player2[1], player3[1]);//display the card in printout
+
+				totDea = dealer[0] + dealer[1];
+				totpalyer = player1[0] + player1[1];
+				totpalyer1 = player2[0] + player2[1];
+				totpalyer2 = player2[0] + player2[1];
+				
+				if ((dealer[0] == 1 || dealer[0] == 10 && totDea == 11) && (player1[0] == 1 || player1[0] == 10 && totpalyer == 11) && (player2[0] == 1 || player2[0] == 10 && totpalyer1 == 11)&& (player3[0] == 1 || player3[0] == 10 && totpalyer2 == 11))
+				{
+					printf("      %d        %d            %d           %d\n", dealer[1], player1[1], player2[1], player3[1]);//display the card in printout
+					printf("*blackjack******blackjack*******blackjack*******blackjack\n");
+					game = endGame();
+				}
+				else if (player1[0] == 1 || player1[0] == 10 && totpalyer == 11)
+				{
+					printf("      %d        %d            %d           %d\n", dealer[1], player1[1], player2[1], player3[1]);//display the card in printout
+					printf("****************blackjack****************\n");
+					game = endGame();
+				}
+				else if (dealer[0] == 1 || dealer[0] == 10 && totDea == 11)
+				{
+					printf("      %d        %d            %d           %d\n", dealer[1], player1[1], player2[1], player3[1]);//display the card in printout
+					printf("*blackjack************************************\n");
+					game = endGame();
+				}
+				else if (player2[0] == 1 || player2[0] == 10 && totpalyer1 == 11)
+				{
+					printf("      %d        %d            %d           %d\n", dealer[1], player1[1], player2[1], player3[1]);//display the card in printout
+					printf("******************************blackjack\n");
+					game = endGame();
+				}
+				else if (player3[0] == 1 || player3[0] == 10 && totpalyer2 == 11)
+				{
+					printf("      %d        %d            %d           %d\n", dealer[1], player1[1], player2[1], player3[1]);//display the card in printout
+					printf("*******************************************blackjack\n");
+					game = endGame();
+				}
+			}
+			}
+			else
+			{
+				printf("Max number of player is 3 \n");
+				printf("enter 0 for end game\n");
+				scanf("%d", &game);
+				j = 2;
+			}
+	
+		}
+	}
+
+	getch();
+}
+
+
+int cardRed(int Array1d[], int size)
+{
+	int cardanaumber;
+	for (int i = 0; i < 1; i++)
+	{
+		int play1 = rand() % 52;
+
+		if (Array1d[play1 - 1] == 0)
+		{
+			i--;
+		}
+		else
+		{
+
+			cardanaumber = Array1d[play1 - 1];
+			Array1d[play1 - 1] = 0;
+		}
+	}
+	return cardanaumber;
+}
+
+int dealerwin(int a, int q)
+{
+	int newGame;
+	printf("Total %d        %d\n", a, q);
+	printf("  DELAER WIN    play LOSS\n");
+	newGame = endGame();
+	return newGame;
+}
+
+int palyWin(int a, int b)
+{
+	int newGame;
+	printf("Total %d        %d\n", a, b);
+	printf("  DELAER LOS    play WIN\n");
+	newGame = endGame();
+	return newGame;
+}
+
+int draw(int s, int w)
+{
+	int newGame;
+	printf("Total %d       %d\n", s, w);
+	printf("*********Draw***********\n");
+	newGame = endGame();
+	return newGame;
+}
+
+int endGame()
+{
+	int newGame;
+	printf("\n*********End of the game***************\n");
+	printf("Enter 1 to start ot 0 to exit \n");
+	scanf("%d", &newGame);
+	while (newGame > 1 || newGame < 0)
+	{
+		printf("please Enter 1 to start ot 0 to exit \n");
+		scanf("%d", &newGame);
+	}
+	return newGame;
+}
